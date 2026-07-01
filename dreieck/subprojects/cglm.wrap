@@ -1,0 +1,6 @@
+[wrap-git]
+url = https://github.com/recp/cglm.git
+revision = v0.9.1
+
+[provide]
+cglm = cglm_dep

@@ -430,5 +430,74 @@ meson setup build
 '''
     write_file(base_path / "README.md", readme)
 
+    # --------------------------------------------------------
+    # 2h. .gitignore
+    # --------------------------------------------------------
+    gitignore_content = '''# -------------------------------
+# Build- & Ausgabe-Verzeichnisse
+# -------------------------------
+build/
+build-*/
+builddir/
+*.exe
+*.out
+*.app
+
+# -------------------------------
+# Von Meson generierte Dateien
+# -------------------------------
+compile_commands.json
+meson-logs/
+meson-private/
+.cache/
+.dirstamp
+
+# -------------------------------
+# Temporäre Dateien (Editoren, Compiler)
+# -------------------------------
+*.swp
+*.swo
+*~
+*.tmp
+*.bak
+*.log
+*.o
+*.obj
+*.a
+*.so
+*.dylib
+*.dll
+*.pdb
+*.ilk
+*.exp
+
+# -------------------------------
+# Von den Embedding-Skripten generierte Dateien
+# (werden zwar im Build-Ordner erzeugt, aber zur Sicherheit)
+# -------------------------------
+shaders_embedded.h
+shaders_embedded.c
+font_embedded.h
+font_embedded.c
+
+# -------------------------------
+# IDE-spezifisch (VS Code, CLion, …)
+# -------------------------------
+.vscode/
+.idea/
+*.iml
+.vs/
+*.user
+*.suo
+
+# -------------------------------
+# Abhängigkeiten, die von Wrap heruntergeladen werden
+# (nur die .wrap-Dateien sollen versioniert werden)
+# -------------------------------
+subprojects/*/
+!subprojects/*.wrap
+'''
+    write_file(base_path / ".gitignore", gitignore_content)
+
 if __name__ == "__main__":
     main()
