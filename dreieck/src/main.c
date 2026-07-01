@@ -1,6 +1,5 @@
-#define GLFW_INCLUDE_NONE   // GLFW lädt keine OpenGL-Header – das übernimmt GLAD
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <glad/glad.h>        // GLAD muss nach GLFW kommen
 #include <cglm/cglm.h>
 #include <stdio.h>
 #include <string.h>
