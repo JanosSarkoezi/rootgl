@@ -5,10 +5,18 @@ project('dreieck', 'c',
 cc = meson.get_compiler('c')
 python = import('python').find_installation('python3')
 
-# Shader einbetten (alle Dateien in shaders/)
+# Hier listest du deine Shader-Dateien auf
+shader_sources = files(
+  'shaders/triangle.frag',
+  'shaders/triangle.vert'
+)
+
 shaders_gen = custom_target('shader_embedding',
+  input : shader_sources,
   output : ['shaders_embedded.h', 'shaders_embedded.c'],
-  command : [python, files('scripts/embed_shaders.py')],
+  # Wir übergeben die Ziel-Dateien (@OUTPUT0@, @OUTPUT1@) und danach alle Shader-Dateien (@INPUT@)
+  command : [python, files('scripts/embed_shaders.py'), '@OUTPUT0@', '@OUTPUT1@', '@INPUT@'],
+  depend_files : shader_sources,
   build_by_default : true
 )
 

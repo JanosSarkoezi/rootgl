@@ -1,36 +1,38 @@
 #!/usr/bin/env python3
 import os
-import glob
 import sys
-
-# Pfad zum Shader-Verzeichnis relativ zu diesem Skript
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-SHADER_DIR = os.path.join(SCRIPT_DIR, '..', 'shaders')
-OUT_H = 'shaders_embedded.h'
-OUT_C = 'shaders_embedded.c'
 
 def escape_c_string(s):
     return s.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n"\n"')
 
 def main():
-    shader_files = glob.glob(os.path.join(SHADER_DIR, '*'))
-    # Sicherstellen, dass nur Dateien (keine Ordner) genommen werden
-    shader_files = [f for f in shader_files if os.path.isfile(f)]
+    # Meson übergibt die Argumente aus dem 'command'-Array:
+    # sys.argv[1] = @OUTPUT0@ (Header-Pfad)
+    # sys.argv[2] = @OUTPUT1@ (C-File-Pfad)
+    # sys.argv[3:] = @INPUT@ (Liste der Shader-Dateien)
+    if len(sys.argv) < 3:
+        print("Fehler: Zu wenige Argumente übergeben.", file=sys.stderr)
+        sys.exit(1)
+
+    out_h = sys.argv[1]
+    out_c = sys.argv[2]
+    shader_files = sys.argv[3:] # Alle restlichen Argumente sind Shader-Dateien
 
     if not shader_files:
-        print(f'Warnung: Keine Shader-Dateien in {SHADER_DIR}/ gefunden.', file=sys.stderr)
+        print('Warnung: Keine Shader-Dateien übergeben.', file=sys.stderr)
 
-    with open(OUT_H, 'w') as h:
+    # 1. Header-Datei schreiben
+    with open(out_h, 'w', encoding='utf-8') as h:
         h.write('#pragma once\n\n')
         h.write('typedef struct { const char* name; const char* source; } ShaderEntry;\n\n')
         h.write('extern const ShaderEntry shader_entries[];\n')
         h.write('extern const unsigned int shader_entries_count;\n')
 
-    with open(OUT_C, 'w') as c:
+    # 2. C-Datei schreiben
+    with open(out_c, 'w', encoding='utf-8') as c:
         c.write('#include "shaders_embedded.h"\n\n')
 
         if not shader_files:
-            # Leere Liste – trotzdem gültigen C‑Code erzeugen
             c.write('const ShaderEntry shader_entries[] = {{NULL, NULL}};\n\n')
             c.write('const unsigned int shader_entries_count = 0;\n')
             return
@@ -40,7 +42,7 @@ def main():
             name = os.path.basename(path)
             var = 'shader_src_' + name.replace('.', '_')
             var_names.append((name, var))
-            with open(path, 'r') as f:
+            with open(path, 'r', encoding='utf-8') as f:
                 content = f.read()
             c.write(f'static const char {var}[] = \n"{escape_c_string(content)}";\n\n')
 
